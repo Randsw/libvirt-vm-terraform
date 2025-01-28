@@ -3,7 +3,6 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-
 resource "libvirt_pool" "pool" {
   name = "${var.prefix}-pool"
   type = "dir"
@@ -12,7 +11,7 @@ resource "libvirt_pool" "pool" {
   }
 }
 
-// Inage volume
+// Image volume
 resource "libvirt_volume" "image" {
   name   = var.image.name
   format = "qcow2"
@@ -20,12 +19,13 @@ resource "libvirt_volume" "image" {
    source = "${path.module}/noble-server-cloudimg-amd64.img"
 }
 
-// VM volume
 resource "libvirt_volume" "root" {
-  name           = "${var.prefix}-root"
+  count = length(var.domains)
+
+  name           = "${var.prefix}-${var.domains[count.index].name}-root"
   pool           = libvirt_pool.pool.name
   base_volume_id = libvirt_volume.image.id
-  size           = var.vm.disk
+  size           = var.domains[count.index].disk
 }
 
 
@@ -48,31 +48,27 @@ resource "libvirt_cloudinit_disk" "commoninit" {
 }
 
 resource "libvirt_domain" "vm" {
-  name   = "${var.prefix}-1"
-  memory = var.vm.ram
-  vcpu   = var.vm.cpu
+  count = length(var.domains)
 
-  cloudinit = libvirt_cloudinit_disk.commoninit.id
-
-#   network_interface {
-#     network_name = "default"
-#     wait_for_lease = true
-#   }
-
-  network_interface {
-    bridge         = var.vm.bridge
-    wait_for_lease = true
-  }
-
-  disk {
-    volume_id = libvirt_volume.root.id
-  }
+  name   = "${var.prefix}-${var.domains[count.index].name}"
+  vcpu   = var.domains[count.index].cpu
+  memory = var.domains[count.index].ram
 
   qemu_agent = true
 
+  cloudinit = libvirt_cloudinit_disk.commoninit.id
+
+  network_interface {
+    bridge         = var.domains[count.index].bridge
+    wait_for_lease = true
+  }
+  disk {
+    volume_id = libvirt_volume.root[count.index].id
+  }
+
   console {
     type        = "pty"
-    target_type = "serial"
     target_port = "0"
+    target_type = "serial"
   }
 }

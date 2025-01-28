@@ -1,16 +1,16 @@
-# Префикс для создаваемых объектов
+# Prefix
 variable "prefix" {
   type    = string
   default = "dev"
 }
 
-# Путь, где будет хранится пул проекта
+# Project pool path
 variable "pool_path" {
   type    = string
   default = "/var/lib/libvirt/"
 }
 
-# Параметры облачного образа
+# OS image 
 variable "image" {
   type = object({
     name = string
@@ -18,12 +18,13 @@ variable "image" {
   })
 }
 
-# Параметры виртуальной машины
-variable "vm" {
-  type = object({
-    cpu    = number
-    ram    = number
-    disk   = number
+variable "domains" {
+  description = "List of VMs with specified parameters"
+  type = list(object({
+    name = string,
+    cpu  = number,
+    ram  = number,
+    disk = number,
     bridge = string
-  })
+  }))
 }
