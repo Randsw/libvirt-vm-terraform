@@ -1,0 +1,38 @@
+- hosts: localhost
+  become: no
+  gather_facts: no
+
+  tasks: 
+
+    - name: Delete VM ssh fingerprint
+      become: false
+      shell: "ssh-keygen -f ~/.ssh/known_hosts -R {{ hostvars[item]['ansible_host'] }}"
+      register: known_hosts_delete
+      changed_when: "'updated' in known_hosts_delete.stdout"
+      loop: "{{ groups['all'] }}"
+
+    - name: Accept server SSH host keys
+      become: false
+      shell: |
+        ssh-keyscan -H {{ hostvars[item]['ansible_host'] }} >> ~/.ssh/known_hosts
+      register: known_hosts_script
+      until: known_hosts_script.rc == 0
+      retries: 5
+      delay: 1
+      changed_when: known_hosts_script.rc != 0
+      loop: "{{ groups['all'] }}"
+
+- hosts: linux_vm
+  become: yes
+  gather_facts: yes
+
+  tasks:
+
+  - name: Ping VM
+    ansible.builtin.ping:
+
+  - name: Print ip address of VW
+    debug:
+      var:  ansible_facts['default_ipv4']['address']
+
+
