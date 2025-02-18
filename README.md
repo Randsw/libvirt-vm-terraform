@@ -40,3 +40,9 @@ ssh -i ssh/vm-private-key.rsa ubuntu@<vm-ip-address>
 ```bash
 terraform destroy
 ```
+
+### Test code
+
+```bash
+make test
+```
