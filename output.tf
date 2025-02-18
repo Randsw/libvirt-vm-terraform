@@ -8,3 +8,15 @@ output "vms_info" {
     }
   ]
 }
+
+locals {
+  inventory_rendered_content = templatefile("${path.module}/inventory_ansible.tftpl", 
+  {
+    vms = "${libvirt_domain.vm}"
+  })
+}
+
+resource "local_file" "inventories" {
+  content = local.inventory_rendered_content
+  filename = "${path.module}/ansible/inventories/linux_vm/hosts.yml"
+}

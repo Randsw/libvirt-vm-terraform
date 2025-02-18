@@ -1,0 +1,10 @@
+all:
+  children:
+    linux_vm:
+      hosts:
+        %{~ for vm in vms ~}
+        ${vm.name}:
+          ansible_host: ${vm.network_interface[0].addresses.0}
+          ansible_ssh_private_key_file: ../ssh/vm-private-key.rsa
+          ansible_user: ubuntu
+        %{~ endfor ~}
