@@ -6,7 +6,7 @@ resource "tls_private_key" "ssh_keys" {
 }
 
 resource "local_file" "private_key" {
-    content  = tls_private_key.ssh_keys.private_key_openssh
-    filename = "ssh/vm-private-key.rsa"
-    file_permission = "0400"
+  content         = tls_private_key.ssh_keys.private_key_openssh
+  filename        = "ssh/vm-private-key.rsa"
+  file_permission = "0400"
 }

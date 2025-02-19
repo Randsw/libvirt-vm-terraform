@@ -21,10 +21,10 @@ variable "image" {
 variable "domains" {
   description = "List of VMs with specified parameters"
   type = list(object({
-    name = string,
-    cpu  = number,
-    ram  = number,
-    disk = number,
+    name   = string,
+    cpu    = number,
+    ram    = number,
+    disk   = number,
     bridge = string
   }))
 }

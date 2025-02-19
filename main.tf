@@ -7,7 +7,7 @@ resource "libvirt_pool" "pool" {
   name = "${var.prefix}-pool"
   type = "dir"
   target {
-      path = "${var.pool_path}${var.prefix}-pool"
+    path = "${var.pool_path}${var.prefix}-pool"
   }
 }
 
@@ -16,7 +16,7 @@ resource "libvirt_volume" "image" {
   name   = var.image.name
   format = "qcow2"
   pool   = libvirt_pool.pool.name
-   source = "${path.module}/noble-server-cloudimg-amd64.img"
+  source = "${path.module}/noble-server-cloudimg-amd64.img"
 }
 
 resource "libvirt_volume" "root" {
@@ -31,8 +31,8 @@ resource "libvirt_volume" "root" {
 
 data "template_file" "user_data" {
   template = file("${path.module}/config/cloud_init.tpl")
-   vars = {
-    ssh_public_key = "${tls_private_key.ssh_keys.public_key_openssh}"
+  vars = {
+    ssh_public_key = tls_private_key.ssh_keys.public_key_openssh
   }
 }
 
